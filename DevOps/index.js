@@ -1,18 +1,37 @@
 var express = require('express');
-
-const PORT = 8888;
-
+var morgan = require('morgan');
 var app = express();
+var pjson = require('./package.json');
 
-app.get('/', function (req, res) {
-  console.log(req);
-  res.send('Bienvenido');
+
+//setup logging
+app.use(morgan('dev'));
+
+// Constants
+const PORT = 3000;
+const HOST = '0.0.0.0' || 'localhost';
+const by = 'https://roxs.295devops.com'
+
+app.get('/getenv/*', function (req, res) {
+  const parts=req.url.split('/');
+  var msg ='';
+
+  if(parts[2]){
+    var variable=parts[2]
+    msg=`\nENVIRONMENT ${variable}\n`+process.env[variable];
+  } else {
+    
+    msg='\nENVIRONMENT VALUES\n'+JSON.stringify(process.env,null,4);
+  }
+  
+  res.send(req.url+msg);
+  console.log(msg);
 });
 
-app.get('/:name', function (req, res) {
-  console.log(req);
-  res.send('Hola ' + req.params.name);
+app.get('/*', function (req, res) {
+  res.send('Hello RoxsRoss! Version to'+req.url+'<hr>package json:'+pjson.version);
 });
 
-app.listen(PORT);
-console.log('Running on http://localhost:' + PORT);
+app.listen(PORT, HOST)
+
+console.log(`Example app listening on http://${HOST}:${PORT} or http://localhost:${PORT} !`);
